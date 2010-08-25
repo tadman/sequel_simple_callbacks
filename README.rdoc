@@ -27,6 +27,19 @@ Sequel::Model with SequelSimpleCallbacks plugin added:
       before_save :do_something, :unless => :some_condition?
     end
     
+== Installation
+
+You can install the gem manually using:
+
+    gem install sequel_simple_callbacks
+    
+You also have the option to declare it in your Gemspec file if using
+bundler:
+
+    gem  'sequel_simple_callbacks'
+
+== Notes
+    
 If any of the callbacks returns false then additional checking will be
 pre-empted and the callback will return false. This will halt processing
 of not only the chain, but the entire operation being performed, as is the
