@@ -10,9 +10,9 @@ end
 class ExampleModel < Sequel::Model(:examples)
   include ModelTriggers
   
-  plugin SimpleSequelCallbacks
+  plugin SequelSimpleCallbacks
 
-  SimpleSequelCallbacks::INSTALLABLE_HOOKS.each do |hook|
+  SequelSimpleCallbacks::INSTALLABLE_HOOKS.each do |hook|
     send(hook, :"do_#{hook}", :if => :triggers_active?)
     
     define_method(:"do_#{hook}") do

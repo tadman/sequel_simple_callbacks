@@ -9,7 +9,7 @@ end
 
 class ConditionalModel < Sequel::Model(:conditionals)
   include ModelTriggers
-  plugin SimpleSequelCallbacks
+  plugin SequelSimpleCallbacks
 
   before_validation do |model|
     model.trigger(:before_validation_with_model)

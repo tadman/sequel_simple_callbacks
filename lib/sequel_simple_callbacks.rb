@@ -1,4 +1,4 @@
-module SimpleSequelCallbacks
+module SequelSimpleCallbacks
   SPECIAL_HOOKS = [
     :before_validation,
     :after_validation
