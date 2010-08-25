@@ -5,13 +5,13 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "sequel_simple_callbacks"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q[Sequel Plugin to add ActiveRecord style callback declarations]
+    gem.description = %Q[This plugin makes it possible to declare simple before and after callbacks on the class level just like ActiveRecord]
     gem.email = "github@tadman.ca"
     gem.homepage = "http://github.com/tadman/sequel_simple_callbacks"
-    gem.authors = ["tadman"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    gem.authors = %w[ tadman ]
+
+    gem.add_development_dependency "sequel"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

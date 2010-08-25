@@ -1,17 +1,85 @@
 = sequel_simple_callbacks
 
-Description goes here.
+This adds ActiveRecord style callback declarations to standard Sequel models.
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+Sequel::Model with no plugins:
+
+    class MyModel < Sequel::Model
+      def before_validation
+        check_something
+        check_something_else
+      end
+      
+      def before_save
+        return unless (some_condition?)
+        
+        do_something
+      end
+    end
+
+Sequel::Model with SequelSimpleCallbacks plugin added:
+    
+    Sequel::Model.plugin(SequelSimpleCallbacks)
+    
+    class MyModel < Sequel::Model
+      before_validation :check_something, :check_something_else
+      
+      before_save :do_something, :unless => :some_condition?
+    end
+    
+If any of the callbacks returns false then additional checking will be
+pre-empted and the callback will return false. This will halt processing
+of not only the chain, but the entire operation being performed, as is the
+expected behavior of Sequel::Model.
+
+Each of the callback methods takes zero or more method names to call as
+part of that callback cycle:
+
+    before_save :method_1, :method_2
+    
+The execution of these methods can be limited conditionally using the
+:if or :unless options either independently or in tandem:
+
+    before_save :method_1, :if => :working?, :unless => :on_break?
+
+The blocks referenced by :if and :unless should return true or false,
+but any value that evaluates as false for :if or true for :unless will
+block execution of these callbacks. Note that this does not halt the
+callback chain.
+
+These arguments can be combined as demonstrated here:
+
+    before_save :method_1, :method_2,
+      :if => :method,
+      :unless => lambda { other_method },
+      :on => :create do
+      check_something
+    end
+
+Any blocks given are evaluated within the context of the model in question,
+but the model may be explicitly specified as a parameter to the block:
+
+  before_save do |model|
+    model.check_something
+  end
+  
+It is important to node that using these class-level declarations means that
+the instance methods with the same name should not be defined:
+
+  before_save :do_something
+  
+  def before_save
+    # WARNING: This will block the :do_something method from running,
+    # as this method over-rides that behavior. Calling super will not
+    # restore this functionality.
+    
+    do_some_stuff
+    
+    # Execute the default behavior as defined in the class if this mixed
+    # approach is strictly required. This is intended as a last-resort.
+    self.class.run_callbacks(self, :before_save)
+  end
 
 == Copyright
 
-Copyright (c) 2010 tadman. See LICENSE for details.
+Copyright (c) 2010 Scott Tadman, The Working Group
