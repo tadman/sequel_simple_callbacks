@@ -73,5 +73,11 @@ class TestSequelSimpleCallbacks < Test::Unit::TestCase
     assert !model.new?
     
     assert_equal [ :before_validation_with_model, :before_validation_without_model, :after_validation_only_on_create, :before_save_with_nil, :before_save_with_true_false ], model.triggered
+    
+    model.clear_triggered!
+
+    model.save
+    
+    assert_equal [ :before_validation_with_model, :before_validation_without_model, :before_save_with_nil, :before_save_with_true_false, :returns_true, :returns_false ], model.triggered
   end
 end

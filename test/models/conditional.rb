@@ -31,7 +31,7 @@ class ConditionalModel < Sequel::Model(:conditionals)
     trigger(:before_save_with_true_false)
   end
 
-  after_update :only => :never do
+  after_update :on => :never do
     trigger(:after_update_never_called)
   end
 
@@ -39,7 +39,24 @@ class ConditionalModel < Sequel::Model(:conditionals)
     trigger(:after_save_not_called)
   end
   
+  after_update :returns_true, :returns_false, :returns_nil
+  
   def never
     false
+  end
+  
+  def returns_true
+    trigger(:returns_true)
+    true
+  end
+  
+  def returns_false
+    trigger(:returns_false)
+    false
+  end
+  
+  def returns_nil
+    trigger(:returns_nil)
+    nil
   end
 end

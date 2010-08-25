@@ -46,8 +46,10 @@ module SimpleSequelCallbacks
             model.new?
           when :update
             !model.new?
-          else
+          when nil
             true
+          else
+            false
           end
         
         if (trigger and !option_if.nil?)
