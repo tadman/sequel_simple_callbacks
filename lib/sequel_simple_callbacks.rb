@@ -14,12 +14,43 @@ module SequelSimpleCallbacks
   STANDARD_HOOKS = (Sequel::Model::HOOKS - SPECIAL_HOOKS).freeze
   INSTALLABLE_HOOKS = (Sequel::Model::HOOKS + ADDITIONAL_HOOKS).freeze
   
-  def apply(model_class)
+  def self.apply(model_class)
   end
   
-  def configure(model_class, *arguments, &block)
+  def self.configure(model_class, *arguments, &block)
+    self.define_callback_hooks(model_class)
   end
-  
+
+  def self.define_callback_hooks(model_class)
+    STANDARD_HOOKS.each do |hook|
+      pre_hook = nil
+
+      if (model_class.instance_methods.include?(hook))
+        pre_hook = :"_internal_#{hook}"
+
+        model_class.send(:alias_method, pre_hook, hook)
+      end
+
+      model_class.send(:define_method, hook) do
+        self.class.run_callbacks(self, hook)
+
+        self.send(pre_hook) if (pre_hook)
+      end
+    end
+
+    SPECIAL_HOOKS.each do |hook|
+      model_class.send(:define_method, hook) do
+        self.class.run_callbacks(self, hook)
+
+        if (new?)
+          self.class.run_callbacks(self, :"#{hook}_on_create")
+        else
+          self.class.run_callbacks(self, :"#{hook}_on_update")
+        end
+      end
+    end
+  end
+
   module ClassMethods
     # Add a callback hook to the model with parameters:
     # * :if => One of [ Symbol, Proc ] (optional)
@@ -98,7 +129,7 @@ module SequelSimpleCallbacks
                 end
               end
             
-            break if (result === false)
+            break if (false === result)
           end
         end
         
@@ -142,24 +173,6 @@ module SequelSimpleCallbacks
   end
 
   module InstanceMethods
-    STANDARD_HOOKS.each do |hook|
-      define_method(hook) do
-        self.class.run_callbacks(self, hook)
-      end
-    end
-    
-    SPECIAL_HOOKS.each do |hook|
-      define_method(hook) do
-        self.class.run_callbacks(self, hook)
-      
-        if (new?)
-          self.class.run_callbacks(self, :"#{hook}_on_create")
-        else
-          self.class.run_callbacks(self, :"#{hook}_on_update")
-        end
-      end
-    end
-    
     # This method is provided as a simple method to call arbitrary callback
     # chains without having to run through the specific method
     def run_callbacks(hook)

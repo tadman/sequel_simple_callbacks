@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "sequel_simple_callbacks"
-    gem.summary = %Q[Sequel Plugin to add ActiveRecord style callback declarations]
+    gem.summary = %Q[Sequel Model plugin that enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution]
     gem.description = %Q[This plugin makes it possible to declare simple before and after callbacks on the class level just like ActiveRecord]
     gem.email = "github@tadman.ca"
     gem.homepage = "http://github.com/tadman/sequel_simple_callbacks"
